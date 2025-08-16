@@ -1,0 +1,19 @@
+# Ignore configuration files with API keys
+config.js
+
+# Ignore node_modules (if you add Node.js later)
+node_modules/
+
+# Ignore log files
+*.log
+
+# Ignore environment files
+.env
+
+# Ignore IDE/project-specific files
+.idea/
+*.iml
+.vscode/
+
+# Ignore macOS system files
+.DS_Store
