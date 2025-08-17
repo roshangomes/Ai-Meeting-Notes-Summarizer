@@ -79,64 +79,36 @@ async function generateSummary() {
 }
 
 // Add this at the top of your file after the global variables
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || window.GEMINI_API_KEY; // Fallback for local testing
+const GEMINI_API_KEY = window.GEMINI_API_KEY; // Fallback for local testing
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
 async function callGeminiAPI(content, prompt) {
-  console.log("Calling Gemini API..."); // Debug log
-
-  const requestBody = {
-    contents: [
-      {
-        parts: [
-          {
-            text: `${prompt}
-
-Meeting Transcript:
-${content}`,
-          },
-        ],
-      },
-    ],
-    generationConfig: {
-      temperature: 0.7,
-      topK: 1,
-      topP: 1,
-      maxOutputTokens: 2048,
-    },
-  };
+  console.log("Calling Gemini API via serverless function..."); // Debug log
 
   try {
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify({ content, prompt }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        `Gemini API Error: ${errorData.error?.message || response.statusText}`
+        `Serverless API Error: ${
+          errorData.error || response.statusText
+        } (Status: ${response.status})`
       );
     }
 
     const data = await response.json();
-    console.log("Gemini API response received"); // Debug log
-
-    if (
-      !data.candidates ||
-      !data.candidates[0] ||
-      !data.candidates[0].content
-    ) {
-      throw new Error("Invalid response format from Gemini API");
-    }
-
-    return data.candidates[0].content.parts[0].text;
+    console.log("Serverless API response received"); // Debug log
+    return data;
   } catch (error) {
-    console.error("Gemini API Error:", error);
+    console.error("Serverless API Error:", error);
     throw error;
   }
 }
