@@ -64,10 +64,11 @@ async function generateSummary() {
     }
 
     currentSummary = summary;
+    const parsedSummary = marked.parse(summary);
     const summaryText = document.getElementById("summaryText");
     const summarySection = document.getElementById("summarySection");
 
-    summaryText.innerHTML = marked.parse(summary);
+    summaryText.innerHTML = parsedSummary;
     summarySection.style.display = "block";
     hideLoading();
     console.log("Summary generated and displayed successfully"); // Debug log
@@ -222,6 +223,7 @@ async function sendEmail() {
     return;
   }
   try {
+    const plainTextSummary = currentSummary.replace(/^\*\s+/gm, "").trim();
     await simulateEmailSending(recipientEmail, emailSubject, currentSummary);
     showEmailSuccess("Summary sent successfully to " + recipientEmail);
     document.getElementById("recipientEmail").value = "";
