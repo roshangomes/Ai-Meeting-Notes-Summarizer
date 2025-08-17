@@ -280,13 +280,32 @@ async function sendEmail() {
     return;
   }
   try {
-    // Convert Markdown to plain text, removing all common Markdown syntax
+    // Convert Markdown to formatted plain text with structured sections and bullets
     const plainTextSummary = currentSummary
-      .replace(/^\*\s+/gm, "") // Remove bullet points
-      .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold markers (e.g., **text** -> text)
-      .replace(/^\s*#+\s*/gm, "") // Remove headers (e.g., # Header)
-      .replace(/_\*(.*?)\*_/g, "$1") // Remove italic markers (e.g., _*text*_)
-      .trim(); // Clean up extra whitespace
+      .split("\n") // Split into lines
+      .map((line) => {
+        let cleanedLine = line
+          .replace(/^\*\s+/gm, "") // Remove original bullet markers
+          .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold markers
+          .replace(/^\s*#+\s*/gm, "") // Remove headers
+          .replace(/_\*(.*?)\*_/g, "$1") // Remove italic markers
+          .trim();
+
+        // Check for section headers (ends with ":") and avoid bullets
+        if (cleanedLine.endsWith(":")) {
+          return cleanedLine;
+        }
+        // Add bullets to list items that were originally bulleted
+        else if (line.match(/^\*\s+/)) {
+          return "- " + cleanedLine;
+        }
+        return cleanedLine;
+      })
+      .join("\n") // Join with single line breaks
+      .replace(/(:\n-)/g, ":\n\n-") // Add extra line break before bulleted lists after headers
+      .replace(/(\w+:)\n(\w)/g, "$1\n\n$2") // Add double line breaks after section headers
+      .trim(); // Clean up whitespace
+
     const response = await fetch("/api/sendEmail", {
       method: "POST",
       headers: {
