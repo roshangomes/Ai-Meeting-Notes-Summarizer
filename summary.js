@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const cancelEditsBtn = document.getElementById("cancelEditsBtn");
   const sendEmailBtn = document.getElementById("sendEmailBtn");
   const cancelEmailBtn = document.getElementById("cancelEmailBtn");
+  const copyBtn = document.getElementById("copyBtn");
+  const downloadBtn = document.getElementById("downloadBtn");
 
   // Add event listeners
   generateBtn.addEventListener("click", generateSummary);
@@ -21,6 +23,13 @@ document.addEventListener("DOMContentLoaded", function () {
   shareBtn.addEventListener("click", showEmailSection);
   sendEmailBtn.addEventListener("click", sendEmail);
   cancelEmailBtn.addEventListener("click", hideEmailSection);
+  copyBtn.addEventListener("click", () => copyToClipboard(currentSummary));
+  downloadBtn.addEventListener("click", () =>
+    downloadSummary(
+      currentSummary,
+      `meeting-summary-${new Date().toISOString().split("T")[0]}.txt`
+    )
+  );
 });
 
 async function generateSummary() {
@@ -343,4 +352,51 @@ async function simulateEmailSending(email, subject, content) {
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
+}
+
+function copyToClipboard(text) {
+  if (!navigator.clipboard) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand("copy");
+      showSuccess("Summary copied to clipboard!");
+    } catch (err) {
+      showError("Failed to copy: " + err.message);
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  } else {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        showSuccess("Summary copied to clipboard!");
+      })
+      .catch((err) => {
+        showError("Failed to copy: " + err.message);
+      });
+  }
+}
+
+function downloadSummary(text, filename) {
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
+  showSuccess("Summary downloaded as " + filename);
+}
+
+function showSuccess(message) {
+  const successDiv = document.getElementById("success");
+  successDiv.textContent = message;
+  successDiv.style.display = "block";
+  setTimeout(() => {
+    successDiv.style.display = "none";
+  }, 3000);
 }
