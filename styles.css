@@ -1,3 +1,4 @@
+/* Reset default styles */
 * {
   margin: 0;
   padding: 0;
@@ -58,9 +59,6 @@ body {
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .upload-area {
@@ -139,10 +137,12 @@ body {
   padding-left: 20px;
 }
 
+/* Remove emoji and use a simple dot */
 .examples li:before {
-  content: "💡";
+  content: "•"; /* Replace 💡 with a standard bullet */
   position: absolute;
   left: 0;
+  color: #3498db;
 }
 
 .prompt-input {
@@ -163,8 +163,9 @@ body {
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
+/* Updated Button Styles */
 .btn {
-  background: linear-gradient(135deg, #3498db, #2980b9);
+  background-color: #4a90e2; /* Solid professional blue */
   color: white;
   border: none;
   padding: 12px 30px;
@@ -173,31 +174,81 @@ body {
   cursor: pointer;
   font-size: 15px;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2980b9, #1f5f8b);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+  background-color: #357abd; /* Darker blue on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn:disabled {
-  background: #bdc3c7;
+  background-color: #bdc3c7;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  background-color: #95a5a6; /* Neutral gray for secondary actions */
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+  background-color: #7f8c8d;
+}
+
+/* Specific Button Variations */
+#generateBtn {
+  background-color: #2ecc71; /* Green for generate */
+}
+
+#generateBtn:hover:not(:disabled) {
+  background-color: #27ae60;
+}
+
+#editBtn,
+#saveEditsBtn {
+  background-color: #3498db; /* Light blue for editing */
+}
+
+#editBtn:hover:not(:disabled),
+#saveEditsBtn:hover:not(:disabled) {
+  background-color: #2980b9;
+}
+
+#cancelEditsBtn,
+#cancelEmailBtn {
+  background-color: #e74c3c; /* Red for cancel */
+}
+
+#cancelEditsBtn:hover:not(:disabled),
+#cancelEmailBtn:hover:not(:disabled) {
+  background-color: #c0392b;
+}
+
+#shareBtn,
+#sendEmailBtn {
+  background-color: #9b59b6; /* Purple for sharing */
+}
+
+#shareBtn:hover:not(:disabled),
+#sendEmailBtn:hover:not(:disabled) {
+  background-color: #8e44ad;
+}
+
+#copyBtn,
+#downloadBtn {
+  background-color: #f1c40f; /* Yellow for copy/download */
+}
+
+#copyBtn:hover:not(:disabled),
+#downloadBtn:hover:not(:disabled) {
+  background-color: #d4a017;
 }
 
 .loading {
@@ -279,7 +330,6 @@ body {
 
 .summary-text h3,
 .summary-text h4 {
-  /* For potential headings in Markdown */
   margin-top: 15px;
   margin-bottom: 5px;
   font-size: 1.2em;
