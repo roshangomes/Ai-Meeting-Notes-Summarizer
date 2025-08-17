@@ -23,7 +23,10 @@ document.addEventListener("DOMContentLoaded", function () {
   shareBtn.addEventListener("click", showEmailSection);
   sendEmailBtn.addEventListener("click", sendEmail);
   cancelEmailBtn.addEventListener("click", hideEmailSection);
-  copyBtn.addEventListener("click", () => copyToClipboard(currentSummary));
+  copyBtn.addEventListener("click", () => {
+    console.log("Copy button clicked, currentSummary:", currentSummary);
+    copyToClipboard(currentSummary);
+  });
   downloadBtn.addEventListener("click", () =>
     downloadSummary(
       currentSummary,
@@ -394,9 +397,26 @@ function downloadSummary(text, filename) {
 
 function showSuccess(message) {
   const successDiv = document.getElementById("success");
-  successDiv.textContent = message;
-  successDiv.style.display = "block";
-  setTimeout(() => {
-    successDiv.style.display = "none";
-  }, 3000);
+  if (successDiv) {
+    successDiv.textContent = message;
+    successDiv.style.display = "block";
+    setTimeout(() => {
+      successDiv.style.display = "none";
+    }, 3000); // Hide after 3 seconds
+  } else {
+    console.warn("Success div not found!");
+  }
+}
+
+function showError(message) {
+  const errorDiv = document.getElementById("error");
+  if (errorDiv) {
+    errorDiv.textContent = message;
+    errorDiv.style.display = "block";
+    setTimeout(() => {
+      errorDiv.style.display = "none";
+    }, 3000); // Hide after 3 seconds
+  } else {
+    console.warn("Error div not found!");
+  }
 }
