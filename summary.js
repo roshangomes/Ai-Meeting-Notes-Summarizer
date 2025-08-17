@@ -114,6 +114,63 @@ async function callGeminiAPI(content, prompt) {
   }
 }
 
+// async function callGeminiAPI(content, prompt) {
+//   console.log("Calling Gemini API directly..."); // Debug log
+
+//   const requestBody = {
+//     contents: [
+//       {
+//         parts: [
+//           {
+//             text: `${prompt}\n\nMeeting Transcript:\n${content}`,
+//           },
+//         ],
+//       },
+//     ],
+//     generationConfig: {
+//       temperature: 0.7,
+//       topK: 1,
+//       topP: 1,
+//       maxOutputTokens: 2048,
+//     },
+//   };
+
+//   try {
+//     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(requestBody),
+//     });
+
+//     if (!response.ok) {
+//       const errorData = await response.json().catch(() => ({}));
+//       throw new Error(
+//         `Gemini API Error: ${
+//           errorData.error?.message || response.statusText
+//         } (Status: ${response.status})`
+//       );
+//     }
+
+//     const data = await response.json();
+//     console.log("Gemini API response received"); // Debug log
+
+//     if (
+//       !data.candidates ||
+//       !data.candidates[0] ||
+//       !data.candidates[0].content
+//     ) {
+//       throw new Error("Invalid response format from Gemini API");
+//     }
+
+//     return data.candidates[0].content.parts[0].text;
+//   } catch (error) {
+//     console.error("Gemini API Error:", error);
+//     throw error;
+//   }
+// }
+
 // Fallback simulation function (in case API fails)
 async function simulateAIGeneration(content, prompt) {
   console.log("Using fallback simulation..."); // Debug log
@@ -223,8 +280,31 @@ async function sendEmail() {
     return;
   }
   try {
-    const plainTextSummary = currentSummary.replace(/^\*\s+/gm, "").trim();
-    await simulateEmailSending(recipientEmail, emailSubject, currentSummary);
+    // Convert Markdown to plain text, removing all common Markdown syntax
+    const plainTextSummary = currentSummary
+      .replace(/^\*\s+/gm, "") // Remove bullet points
+      .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold markers (e.g., **text** -> text)
+      .replace(/^\s*#+\s*/gm, "") // Remove headers (e.g., # Header)
+      .replace(/_\*(.*?)\*_/g, "$1") // Remove italic markers (e.g., _*text*_)
+      .trim(); // Clean up extra whitespace
+    const response = await fetch("/api/sendEmail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        recipientEmail,
+        subject: emailSubject,
+        content: plainTextSummary,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to send email");
+    }
+
+    const data = await response.json();
     showEmailSuccess("Summary sent successfully to " + recipientEmail);
     document.getElementById("recipientEmail").value = "";
     document.getElementById("emailSubject").value = "Meeting Summary";
